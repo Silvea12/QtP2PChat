@@ -96,6 +96,13 @@ bool Connection::sendMeMessage(const QString &message)
     return write(data) == data.size();
 }
 
+bool Connection::sendExit(const QString &message)
+{
+    QByteArray msg = message.toUtf8();
+    QByteArray data = "EXIT " + QByteArray::number(msg.size()) + ' ' + msg;
+    return write(data) == data.size();
+}
+
 void Connection::timerEvent(QTimerEvent *timerEvent)
 {
     if (timerEvent->timerId() == transferTimerId) {
@@ -229,6 +236,8 @@ bool Connection::readProtocolHeader()
         currentDataType = PlainMeText;
     } else if (buffer == "GREETING ") {
         currentDataType = Greeting;
+    } else if (buffer == "EXIT ") {
+        currentDataType = Exit;
     } else {
         currentDataType = Undefined;
         abort();
@@ -279,6 +288,9 @@ void Connection::processData()
         break;
     case Pong:
         pongTime.restart();
+        break;
+    case Exit:
+        emit exitMessage(QString::fromUtf8(buffer));
         break;
     default:
         break;

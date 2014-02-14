@@ -65,6 +65,7 @@ public:
         Ping,
         Pong,
         Greeting,
+        Exit,
         Undefined
     };
 
@@ -74,11 +75,13 @@ public:
     void setGreetingMessage(const QString &message);
     bool sendMessage(const QString &message);
     bool sendMeMessage(const QString &message);
+    bool sendExit(const QString &message);
 
 signals:
     void readyForUse();
     void newMessage(const QString &from, const QString &message);
     void newMeMessage(const QString &from, const QString &message);
+    void exitMessage(const QString &message);
 
 protected:
     void timerEvent(QTimerEvent *timerEvent);

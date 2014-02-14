@@ -76,8 +76,19 @@ void Client::sendMeMessage(const QString &message)
         connection->sendMeMessage(message);
 }
 
+void Client::sendExit(const QString &message)
+{
+    if (message.isEmpty())
+        return;
+
+    QList<Connection *> connections = peers.values();
+    foreach (Connection *connection, connections)
+        connection->sendExit(message);
+}
+
 QString Client::nickName() const
 {
+    return QString(peerManager->userName());
     return QString(peerManager->userName()) + '@' + QHostInfo::localHostName()
            + ':' + QString::number(server.serverPort());
 }
@@ -120,6 +131,8 @@ void Client::readyForUse()
             this, SIGNAL(newMessage(QString,QString)));
     connect(connection, SIGNAL(newMeMessage(QString,QString)),
             this, SIGNAL(newMeMessage(QString,QString)));
+    connect(connection, SIGNAL(exitMessage(QString)),
+            this, SIGNAL(exitMessage(QString)));
 
     peers.insert(connection->peerAddress(), connection);
     QString nick = connection->name();

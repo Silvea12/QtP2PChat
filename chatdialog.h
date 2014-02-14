@@ -54,6 +54,7 @@ public:
 public slots:
     void appendMessage(const QString &from, const QString &message);
     void appendMeMessage(const QString &from, const QString &message);
+    void exitMessage(const QString &message);
 
 private slots:
     void returnPressed();

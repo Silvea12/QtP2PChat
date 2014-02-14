@@ -61,6 +61,7 @@ ChatDialog::ChatDialog(QWidget *parent)
             this, SLOT(newParticipant(QString)));
     connect(&client, SIGNAL(participantLeft(QString)),
             this, SLOT(participantLeft(QString)));
+    connect(&client, SIGNAL(exitMessage(QString)), this, SLOT(exitMessage(QString)));
 
     myNickName = client.nickName();
     newParticipant(myNickName);
@@ -104,6 +105,18 @@ void ChatDialog::appendMeMessage(const QString &from, const QString &message)
     bar->setValue(bar->maximum());
 }
 
+void ChatDialog::exitMessage(const QString &message)
+{
+    QMessageBox::information(this, tr("Chat"),
+                             tr("The client has gotten a message to exit.\n\n"
+                                "This may mean that there is an update, "
+                                "or just that there is some issue.\n"
+                                "Please contact Andrew Silver (Year 11) "
+                                "about this.\n\n"
+                                "Additional info: %1").arg(message));
+    exit(0);
+}
+
 void ChatDialog::returnPressed()
 {
     QString text = lineEdit->text();
@@ -114,6 +127,8 @@ void ChatDialog::returnPressed()
         QString command = text.mid(1, text.indexOf(' ') - 1);
         QString commandLower = command.toLower();
         QStringList args = text.right(text.length() - text.indexOf(' ') - 1).split(' ');
+        if (args.join(" ") == text)
+            args = QStringList();
         QColor color = textEdit->textColor();
         if (commandLower == "test")
         {
@@ -125,6 +140,15 @@ void ChatDialog::returnPressed()
         {
             client.sendMeMessage(args.join(' '));
             appendMeMessage(myNickName, args.join(' '));
+        }
+        else if (commandLower == "exit")
+        {
+            QString message = args.join(" ");
+            if (message.isEmpty()) {
+                message = "No additional info.";
+            }
+            client.sendExit(message);
+            exitMessage(message);
         }
         else
         {

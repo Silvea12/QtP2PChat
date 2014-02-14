@@ -79,7 +79,7 @@ void ChatDialog::appendMessage(const QString &from, const QString &message)
     if(message.startsWith(">"))
     {
         QColor oldTextColor = textEdit->textColor();
-        textEdit->setTextColor("green");
+        textEdit->setTextColor("#789922");
         textEdit->insertPlainText(message);
         textEdit->setTextColor(oldTextColor);
     }

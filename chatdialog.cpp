@@ -65,7 +65,7 @@ ChatDialog::ChatDialog(QWidget *parent)
     myNickName = client.nickName();
     newParticipant(myNickName);
     tableFormat.setBorder(0);
-    QTimer::singleShot(10 * 1000, this, SLOT(showInformation()));
+    //QTimer::singleShot(10 * 1000, this, SLOT(showInformation()));
 }
 
 void ChatDialog::appendMessage(const QString &from, const QString &message)
@@ -73,13 +73,17 @@ void ChatDialog::appendMessage(const QString &from, const QString &message)
     if (from.isEmpty() || message.isEmpty())
         return;
 
-    QTextCursor cursor(textEdit->textCursor());
-    cursor.movePosition(QTextCursor::End);
-    QTextTable *table = cursor.insertTable(1, 2, tableFormat);
-    table->cellAt(0, 0).firstCursorPosition().insertText('<' + from + "> ");
-    table->cellAt(0, 1).firstCursorPosition().insertText(message);
-    QScrollBar *bar = textEdit->verticalScrollBar();
-    bar->setValue(bar->maximum());
+    textEdit->append("");
+    textEdit->insertPlainText('<' + from + "> ");
+    if(message.startsWith(">"))
+    {
+        QColor oldTextColor = textEdit->textColor();
+        textEdit->setTextColor("green");
+        textEdit->insertPlainText(message);
+        textEdit->setTextColor(oldTextColor);
+    }
+    else
+        textEdit->insertPlainText(message);
 }
 
 void ChatDialog::appendMeMessage(const QString &from, const QString &message)

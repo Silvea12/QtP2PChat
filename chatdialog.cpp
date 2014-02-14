@@ -55,6 +55,8 @@ ChatDialog::ChatDialog(QWidget *parent)
     connect(lineEdit, SIGNAL(returnPressed()), this, SLOT(returnPressed()));
     connect(&client, SIGNAL(newMessage(QString,QString)),
             this, SLOT(appendMessage(QString,QString)));
+    connect(&client, SIGNAL(newMeMessage(QString,QString)),
+            this, SLOT(appendMeMessage(QString,QString)));
     connect(&client, SIGNAL(newParticipant(QString)),
             this, SLOT(newParticipant(QString)));
     connect(&client, SIGNAL(participantLeft(QString)),
@@ -80,6 +82,24 @@ void ChatDialog::appendMessage(const QString &from, const QString &message)
     bar->setValue(bar->maximum());
 }
 
+void ChatDialog::appendMeMessage(const QString &from, const QString &message)
+{
+    if (from.isEmpty() || message.isEmpty())
+        return;
+
+    textEdit->append("");
+    QColor oldTextColor = textEdit->textColor();
+    int oldFontWeight = textEdit->fontWeight();
+    textEdit->setTextColor("purple");
+    textEdit->setFontWeight(QFont::Bold);
+    textEdit->insertPlainText(tr("* %1 ").arg(from));
+    textEdit->setFontWeight(oldFontWeight);
+    textEdit->insertPlainText(message);
+    textEdit->setTextColor(oldTextColor);
+    QScrollBar *bar = textEdit->verticalScrollBar();
+    bar->setValue(bar->maximum());
+}
+
 void ChatDialog::returnPressed()
 {
     QString text = lineEdit->text();
@@ -88,13 +108,19 @@ void ChatDialog::returnPressed()
 
     if (text.startsWith(QChar('/'))) {
         QString command = text.mid(1, text.indexOf(' ') - 1);
+        QString commandLower = command.toLower();
         QStringList args = text.right(text.length() - text.indexOf(' ') - 1).split(' ');
         QColor color = textEdit->textColor();
-        if (command == "test")
+        if (commandLower == "test")
         {
             textEdit->setTextColor(Qt::blue);
             textEdit->append(tr("Test detected! Arguments: \"%1\"").arg(args.join("\", \"")));
             textEdit->setTextColor(color);
+        }
+        else if (commandLower == "me")
+        {
+            client.sendMeMessage(args.join(' '));
+            appendMeMessage(myNickName, args.join(' '));
         }
         else
         {

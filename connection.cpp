@@ -86,6 +86,16 @@ bool Connection::sendMessage(const QString &message)
     return write(data) == data.size();
 }
 
+bool Connection::sendMeMessage(const QString &message)
+{
+    if (message.isEmpty())
+        return false;
+
+    QByteArray msg = message.toUtf8();
+    QByteArray data = "MEMESSAGE " + QByteArray::number(msg.size()) + ' ' + msg;
+    return write(data) == data.size();
+}
+
 void Connection::timerEvent(QTimerEvent *timerEvent)
 {
     if (timerEvent->timerId() == transferTimerId) {
@@ -215,6 +225,8 @@ bool Connection::readProtocolHeader()
         currentDataType = Pong;
     } else if (buffer == "MESSAGE ") {
         currentDataType = PlainText;
+    } else if (buffer == "MEMESSAGE ") {
+        currentDataType = PlainMeText;
     } else if (buffer == "GREETING ") {
         currentDataType = Greeting;
     } else {
@@ -258,6 +270,9 @@ void Connection::processData()
     switch (currentDataType) {
     case PlainText:
         emit newMessage(username, QString::fromUtf8(buffer));
+        break;
+    case PlainMeText:
+        emit newMeMessage(username, QString::fromUtf8(buffer));
         break;
     case Ping:
         write("PONG 1 p");

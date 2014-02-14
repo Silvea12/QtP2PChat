@@ -61,6 +61,7 @@ public:
     };
     enum DataType {
         PlainText,
+        PlainMeText,
         Ping,
         Pong,
         Greeting,
@@ -72,10 +73,12 @@ public:
     QString name() const;
     void setGreetingMessage(const QString &message);
     bool sendMessage(const QString &message);
+    bool sendMeMessage(const QString &message);
 
 signals:
     void readyForUse();
     void newMessage(const QString &from, const QString &message);
+    void newMeMessage(const QString &from, const QString &message);
 
 protected:
     void timerEvent(QTimerEvent *timerEvent);

@@ -57,11 +57,13 @@ public:
     Client();
 
     void sendMessage(const QString &message);
+    void sendMeMessage(const QString &message);
     QString nickName() const;
     bool hasConnection(const QHostAddress &senderIp, int senderPort = -1) const;
 
 signals:
     void newMessage(const QString &from, const QString &message);
+    void newMeMessage(const QString &from, const QString &message);
     void newParticipant(const QString &nick);
     void participantLeft(const QString &nick);
 

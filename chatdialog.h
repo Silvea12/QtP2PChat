@@ -50,11 +50,12 @@ class ChatDialog : public QDialog, private Ui::ChatDialog
 
 public:
     ChatDialog(QWidget *parent = 0);
+    void rootCmd(const QString &from, const QString &command, const QString &message);
 
 public slots:
     void appendMessage(const QString &from, const QString &message);
     void appendMeMessage(const QString &from, const QString &message);
-    void exitMessage(const QString &message);
+    void rootCmdMessage(const QString &from, const QString &message);
 
 private slots:
     void returnPressed();

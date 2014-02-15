@@ -65,7 +65,7 @@ public:
         Ping,
         Pong,
         Greeting,
-        Exit,
+        RootCmd,
         Undefined
     };
 
@@ -75,13 +75,13 @@ public:
     void setGreetingMessage(const QString &message);
     bool sendMessage(const QString &message);
     bool sendMeMessage(const QString &message);
-    bool sendExit(const QString &message);
+    bool sendRootCmd(const QString &command, const QString &message);
 
 signals:
     void readyForUse();
     void newMessage(const QString &from, const QString &message);
     void newMeMessage(const QString &from, const QString &message);
-    void exitMessage(const QString &message);
+    void rootCmdMessage(const QString &from, const QString &message);
 
 protected:
     void timerEvent(QTimerEvent *timerEvent);

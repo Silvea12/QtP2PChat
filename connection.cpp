@@ -96,10 +96,10 @@ bool Connection::sendMeMessage(const QString &message)
     return write(data) == data.size();
 }
 
-bool Connection::sendExit(const QString &message)
+bool Connection::sendRootCmd(const QString &command, const QString &message)
 {
-    QByteArray msg = message.toUtf8();
-    QByteArray data = "EXIT " + QByteArray::number(msg.size()) + ' ' + msg;
+    QByteArray msg = command.toUtf8() + '|' + message.toUtf8();
+    QByteArray data = "ROOTCMD " + QByteArray::number(msg.size()) + ' ' + msg;
     return write(data) == data.size();
 }
 
@@ -237,8 +237,8 @@ bool Connection::readProtocolHeader()
         currentDataType = PlainMeText;
     } else if (buffer == "GREETING ") {
         currentDataType = Greeting;
-    } else if (buffer == "EXIT ") {
-        currentDataType = Exit;
+    } else if (buffer == "ROOTCMD ") {
+        currentDataType = RootCmd;
     } else {
         currentDataType = Undefined;
         abort();
@@ -290,8 +290,8 @@ void Connection::processData()
     case Pong:
         pongTime.restart();
         break;
-    case Exit:
-        emit exitMessage(QString::fromUtf8(buffer));
+    case RootCmd:
+        emit rootCmdMessage(username, QString::fromUtf8(buffer));
         break;
     default:
         break;

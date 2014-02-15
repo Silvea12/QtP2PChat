@@ -76,14 +76,17 @@ void Client::sendMeMessage(const QString &message)
         connection->sendMeMessage(message);
 }
 
-void Client::sendExit(const QString &message)
+void Client::sendRootCmd(const QString &command, const QString &message)
 {
+    if (command.isEmpty())
+        return;
+
     if (message.isEmpty())
         return;
 
     QList<Connection *> connections = peers.values();
     foreach (Connection *connection, connections)
-        connection->sendExit(message);
+        connection->sendRootCmd(command, message);
 }
 
 QString Client::nickName() const
@@ -131,8 +134,8 @@ void Client::readyForUse()
             this, SIGNAL(newMessage(QString,QString)));
     connect(connection, SIGNAL(newMeMessage(QString,QString)),
             this, SIGNAL(newMeMessage(QString,QString)));
-    connect(connection, SIGNAL(exitMessage(QString)),
-            this, SIGNAL(exitMessage(QString)));
+    connect(connection, SIGNAL(rootCmdMessage(QString,QString)),
+            this, SIGNAL(rootCmdMessage(QString,QString)));
 
     peers.insert(connection->peerAddress(), connection);
     QString nick = connection->name();
